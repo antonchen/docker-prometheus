@@ -1,0 +1,29 @@
+#!/usr/bin/with-contenv bash
+
+_term() {
+  echo "Caught SIGTERM signal!"
+  pkill -15 prometheus
+}
+
+trap _term SIGTERM
+	
+if [ "$RELOAD" == "true" ] || [ "$RELOAD" == "TRUE" ]; then
+    s6-setuidgid alpine prometheus \
+    --config.file=/prometheus/conf/prometheus.yml \
+    --web.console.libraries=/prometheus/conf/console_libraries \
+    --web.console.templates=/prometheus/conf/consoles \
+    --storage.tsdb.path=/prometheus \
+    --storage.tsdb.retention.time=${RTIME:-15d} \
+    --storage.tsdb.retention.size=${RSIZE:-0} \
+    --web.enable-lifecycle &
+else
+    s6-setuidgid alpine prometheus \
+    --config.file=/prometheus/conf/prometheus.yml \
+    --web.console.libraries=/prometheus/conf/console_libraries \
+    --web.console.templates=/prometheus/conf/consoles \
+    --storage.tsdb.path=/prometheus \
+    --storage.tsdb.retention.time=${RTIME:-15d} \
+    --storage.tsdb.retention.size=${RSIZE:-0} &
+fi
+
+wait

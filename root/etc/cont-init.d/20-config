@@ -1,0 +1,12 @@
+#!/usr/bin/with-contenv bash
+
+# check config folders
+[[ -d /prometheus/conf ]] || mkdir -p /prometheus/conf
+
+# copy config
+[[ -f /prometheus/conf/prometheus.yml ]] || cp /etc/prometheus/prometheus.yml /prometheus/conf/
+[[ -d /prometheus/conf/console_libraries ]] || cp -r /etc/prometheus/console_libraries /prometheus/conf/
+[[ -d /prometheus/conf/consoles ]] || cp -r /etc/prometheus/consoles /prometheus/conf/
+
+# permissions
+chown -R alpine:alpine /prometheus
